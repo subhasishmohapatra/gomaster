@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.0" package="Bmm.Bmm" android:installLocation="auto">
+  <uses-sdk android:minSdkVersion="19" android:targetSdkVersion="21" />
+  <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+  <application android:allowBackup="true" android:theme="@style/MyTheme" android:label="@string/app_name" android:name="android.app.Application" android:debuggable="true">
+    <activity android:label="Activity1" android:name="md5959bf32e951a36f2f84822ebc69212dc.Activity1" />
+    <activity android:label="ChooseDocActivity" android:name="md5959bf32e951a36f2f84822ebc69212dc.ChooseDocActivity" />
+    <activity android:label="Book My Medic" android:name="md5959bf32e951a36f2f84822ebc69212dc.IconTabActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity>
+    <provider android:name="mono.MonoRuntimeProvider" android:exported="false" android:initOrder="2147483647" android:authorities="Bmm.Bmm.mono.MonoRuntimeProvider.__mono_init__" />
+    <!--suppress ExportedReceiver-->
+    <receiver android:name="mono.android.Seppuku">
+      <intent-filter>
+        <action android:name="mono.android.intent.action.SEPPUKU" />
+        <category android:name="mono.android.intent.category.SEPPUKU.Bmm.Bmm" />
+      </intent-filter>
+    </receiver>
+  </application>
+</manifest>

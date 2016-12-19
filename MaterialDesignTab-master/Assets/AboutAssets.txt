@@ -1,0 +1,217 @@
+Any raw assets you want to be deployed with your application can be placed in
+this directory (and child directories) and given a Build Action of "AndroidAsset".
+
+These files will be deployed with your package and will be accessible using Android's
+AssetManager, like this:
+
+public class ReadAsset : Activity
+{
+	protected override void OnCreate (Bundle bundle)
+	{
+		base.OnCreate (bundle);
+
+		InputStream input = Assets.Open ("my_asset.txt");
+	}
+}
+
+Additionally, some Android functions will automatically load asset files:
+
+Typeface tf = Typeface.CreateFromAsset (Context.Assets, "fonts/samplefont.ttf");
+
+------------------------------------------------------------------------------------------
+[correction to blog : GCM link, design intro to previous]
+Material design tab in xamarin android 
+
+Introduction: Here i'm adding one more UI component to Android Material Design[link] introduction series i.e. Tab control using 
+android material design library in xamarin android. 
+Pic:
+
+Description:
+According to google doc[link:1]Tabs make it easy to explore and switch between different views or functional aspects of an app or to browse categorized
+ data sets. Xamarin android support design library [https://www.nuget.org/packages/Xamarin.Android.Support.Design/] is the 
+ C# bindings for xamarin which provides the backward compatibility to number material design component up to Andriod API level 15.
+This Support design library should be used with theme Theme.AppCompat or inherit from Theme.AppCompat found in the AppCompat v7 Support library.
+
+Steps 1: Prepare Prerequisites
+Setup xamarin android project and Add "Xamarin Android Support Library - Design" nuget packege.
+[screen]
+
+Step 2: Make the necessary changes to Styles.xml. As Support design library works only with Theme.AppCompat, App theme should be
+inherited from Theme.AppCompat as follows.
+
+ &lt;?xml version="1.0" encoding="UTF-8" ? &gt;
+ &lt;resources  &gt;
+ &lt;style name="DesignTheme" parent="Theme.AppCompat.Light.DarkActionBar" &gt;
+   &lt;item name="windowNoTitle" &gt;true &lt;/item &gt;
+      &lt;item name="windowActionBar" &gt;false &lt;/item &gt;
+         &lt;item name="colorPrimary" &gt;@color/primary &lt;/item &gt;
+         &lt;item name="colorPrimaryDark" &gt;@color/primary_dark &lt;/item &gt;
+         &lt;item name="colorAccent" &gt;@color/accent &lt;/item &gt; &lt;/style &gt;
+ &lt;/resources &gt;
+
+Step 3: Accordingly Add style tag to manifest application tag theme property (android:theme="@style/DesignTheme")
+
+&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.0" package="com.codelog.tabbedapp"&gt;
+	&lt;uses-sdk android:minSdkVersion="16" android:targetSdkVersion="23" /&gt;
+	&lt;application android:allowBackup="true" android:theme="@style/DesignTheme" android:icon="@mipmap/icon" android:label="@string/app_name"&gt;&lt;/application&gt;
+&lt;/manifest&gt;
+
+Step 4: Now under Resource, create a folder named values-v21. Inside this create another styles.xml with the below styles.
+These styles are specific to Android 5.0
+
+&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+&lt;resources&gt;
+	&lt;style name="MyTheme" parent="MyTheme.Base"&gt;
+		&lt;item name="android:windowContentTransitions"&gt;true&lt;/item&gt;
+		&lt;item name="android:windowAllowEnterTransitionOverlap"&gt;true&lt;/item&gt;
+		&lt;item name="android:windowAllowReturnTransitionOverlap"&gt;true&lt;/item&gt;
+		&lt;item name="android:windowSharedElementEnterTransition"&gt;@android:transition/move&lt;/item&gt;
+		&lt;item name="android:windowSharedElementExitTransition"&gt;@android:transition/move&lt;/item&gt;
+	&lt;/style&gt;
+&lt;/resources&gt;
+
+Step 5: Open the Layout file Main.axml and add below layout code.
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:id="@+id/layout_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+	<android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+	    xmlns:app="http://schemas.android.com/apk/res-auto"
+	    android:id="@+id/app_bar"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:minHeight="?attr/actionBarSize"
+	    android:background="#ff1976d2"
+	    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+	    app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+    <android.support.design.widget.TabLayout
+        android:id="@+id/sliding_tabs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#ff1976d2"
+        app:tabMode="fixed"
+        app:tabGravity="fill" />
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight="1"
+        android:background="#ffffff" />
+    </LinearLayout>
+</LinearLayout> 
+
+Step 6: Do the following changes to MainActivity.cs 
+TabsFragmentPagerAdapter – Custom adapter class provides fragments required for the view pager.
+SetupWithViewPager() – Assigns ViewPager to tablayout 
+ 
+MainActivity.cs
+
+using Android.App;
+using Android.Widget;
+using Android.OS;
+using Android.Support.V7.App; 
+using Android.Support.V4.App;
+using Android.Content;
+using Android.Support.V7.Widget;
+using Android.Support.Design.Widget;
+using Android.Runtime;
+using Android.Support.V4.View; 
+
+namespace TabbedApp
+{
+	[Activity (Label = "TabbedApp",Icon = "@mipmap/icon")]
+	public class MainActivity : FragmentActivity
+	{ 
+		TabLayout tabLayout;
+		protected override void OnCreate (Bundle savedInstanceState)
+		{
+			base.OnCreate (savedInstanceState); 
+			SetContentView (Resource.Layout.Main); 
+			tabLayout=FindViewById<TabLayout>(Resource.Id.sliding_tabs); 
+			FnInitTabLayout (); 
+		}
+		void FnInitTabLayout()
+		{
+			tabLayout.SetTabTextColors (Android.Graphics.Color.Aqua,Android.Graphics.Color.AntiqueWhite);
+			//Fragment array
+			var fragments = new Android.Support.V4.App.Fragment[]
+			{ 
+				new BlueFragment(),
+				new GreenFragment(),
+				new YellowFragment(), 
+			}; 
+			//Tab title array
+			var titles = CharSequence.ArrayFromStringArray (new[] { 
+				"Blue",
+				"Green",
+				"Yellow", 
+			});
+
+			var viewPager = FindViewById<ViewPager>(Resource.Id.viewpager);
+			//viewpager holding fragment array and tab title text
+			viewPager.Adapter = new TabsFragmentPagerAdapter(SupportFragmentManager, fragments, titles);
+
+			// Give the TabLayout the ViewPager 
+			tabLayout.SetupWithViewPager(viewPager);  
+		} 
+	
+		public void OnClick(IDialogInterface dialog, int which)
+		{
+			dialog.Dismiss();
+		}
+
+	} 
+}
+
+TabsFragmentPagerAdapter.cs
+
+using System;
+using Android.Support.V4.App;
+using Java.Lang;
+
+namespace TabbedApp
+{
+	public class TabsFragmentPagerAdapter : FragmentPagerAdapter
+	{
+		private readonly Fragment[] fragments;
+
+		private readonly ICharSequence[] titles;
+
+		public TabsFragmentPagerAdapter(FragmentManager fm, Fragment[] fragments, ICharSequence[] titles) : base(fm)
+		{
+			this.fragments = fragments;
+			this.titles = titles;
+		}
+		public override int Count
+		{
+			get
+			{
+				return fragments.Length;
+			}
+		}
+
+		public override Fragment GetItem(int position)
+		{
+			return fragments[position];
+		}
+
+		public override ICharSequence GetPageTitleFormatted(int position)
+		{
+			return titles[position]; 
+		}
+	}
+}
+
+
+
+Reference: https://www.google.com/design/spec/components/tabs.html#
+http://android-developers.blogspot.in/2015/05/android-design-support-library.html
